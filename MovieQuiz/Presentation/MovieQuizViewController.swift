@@ -3,13 +3,13 @@ import UIKit
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterDelegate, StatisticServiceDelegate {
     
     // MARK: - IB Outlets
-    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet private weak var imageView: UIImageView!
     
-    @IBOutlet private var textLabel: UILabel!
-    @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet private weak var textLabel: UILabel!
+    @IBOutlet private weak var counterLabel: UILabel!
     
-    @IBOutlet private var yesButton: UIButton!
-    @IBOutlet private var noButton: UIButton!
+    @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private weak var noButton: UIButton!
     
     // MARK: - Private Properties
     private var currentQuestionIndex = Int.zero
@@ -24,12 +24,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
-        self.questionFactory = questionFactory
-        self.questionFactory?.requestNextQuestion()
-        self.alertPresenter = AlertPresenter(delegate: self)
-        self.statisticService = StatisticService(delegate: self)
+        configureDependencies()
+        questionFactory?.requestNextQuestion()
     }
     
     // MARK: - Status Bar Configuration
@@ -97,6 +93,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     // MARK: - Private Methods
+    private func configureDependencies() {
+        let questionFactory = QuestionFactory()
+        questionFactory.setup(delegate: self)
+        self.questionFactory = questionFactory
+        self.alertPresenter = AlertPresenter(delegate: self)
+        self.statisticService = StatisticService(delegate: self)
+    }
+    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -134,22 +138,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private func showAnswerResult(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        if isCorrect {
-            imageView.layer.borderColor = UIColor(named: "YP Green")?.cgColor
-            correctAnswers += 1
-        } else {
-            imageView.layer.borderColor = UIColor(named: "YP Red")?.cgColor
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.showNextQuestionOrResults()
-        }
+        imageView.layer.borderColor = UIColor(named: isCorrect ? "YP Green" : "YP Red")?.cgColor
         
+        if isCorrect { correctAnswers += 1 }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            self?.showNextQuestionOrResults()
+        }
     }
     
     private func showNextQuestionOrResults() {
         
-        // TODO: - текст алерта нужно изменить
         if currentQuestionIndex == questionsAmount - 1 {
             statisticService?.store(correct: correctAnswers, total: questionsAmount)
         } else {
