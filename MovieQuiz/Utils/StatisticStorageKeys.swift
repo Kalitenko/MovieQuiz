@@ -6,4 +6,3 @@ enum StatisticStorageKeys: String {
     case bestGameTotal
     case bestGameDate
 }
-
