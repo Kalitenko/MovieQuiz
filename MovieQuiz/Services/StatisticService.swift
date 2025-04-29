@@ -2,21 +2,24 @@ import Foundation
 
 final class StatisticService {
     
+    // MARK: - Private Properties
     private weak var delegate: StatisticServiceDelegate?
     private let storage: UserDefaults = .standard
     
+    // MARK: - Initializers
     init(delegate: StatisticServiceDelegate?) {
         self.delegate = delegate
     }
     
+    // MARK: - Private Methods
     private func didStoreData(_ bestGame: GameResult) {
         delegate?.didStoreData(bestGame: bestGame)
     }
-    
 }
 
 extension StatisticService: StatisticServiceProtocol {
     
+    // MARK: - Public Properties
     var gamesCount: Int {
         get {
             storage.integer(forKey: StatisticStorageKeys.gamesCount.rawValue)
@@ -57,6 +60,7 @@ extension StatisticService: StatisticServiceProtocol {
         }
     }
     
+    // MARK: - Private Properties
     private var correctAnswers: Int {
         get {
             storage.integer(forKey: StatisticStorageKeys.correctAnswers.rawValue)
@@ -65,7 +69,7 @@ extension StatisticService: StatisticServiceProtocol {
             storage.set(newValue, forKey: StatisticStorageKeys.correctAnswers.rawValue)
         }
     }
-        
+    
     private var totalAnswers: Int {
         get {
             storage.integer(forKey: StatisticStorageKeys.totalAnswers.rawValue)
@@ -75,6 +79,7 @@ extension StatisticService: StatisticServiceProtocol {
         }
     }
     
+    // MARK: - Public Methods
     func store(correct count: Int, total amount: Int) {
         let currentGame: GameResult = GameResult(correct: count, total: amount, date: Date())
         if currentGame.isBetterThan(bestGame) {
@@ -85,6 +90,5 @@ extension StatisticService: StatisticServiceProtocol {
         gamesCount += 1
         didStoreData(bestGame)
     }
-    
     
 }
