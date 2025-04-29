@@ -5,13 +5,20 @@ protocol MoviesLoading {
 }
 
 struct MoviesLoader: MoviesLoading {
+    
+    // MARK: - Private Enums
+    private enum Constants {
+        static let mostPopularMoviesURLString = "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf"
+    }
+    
     // MARK: - NetworkClient
     private let networkClient = NetworkClient()
+    
     
     // MARK: - URL
     private var mostPopularMoviesUrl: URL {
         
-        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
+        guard let url = URL(string: Constants.mostPopularMoviesURLString) else {
             preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
         return url

@@ -57,6 +57,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     // MARK: - Public Methods
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
+        hideLoadingIndicator()
         guard let question = question else {
             return
         }
@@ -70,12 +71,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription)
+        var message = "Ошибка с загрузкой данных"
+        if let networkError = error as? NetworkError {
+            message = networkError.errorMessage()
+        }
+        showNetworkError(message: message)
     }
     
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
+        hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
+    }
+    
+    func didBeginAssemblingNextQuestion() {
+        showLoadingIndicator()
     }
     
     // MARK: - AlertPresenterDelegate
@@ -182,17 +191,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private func showNetworkError(message: String) {
         hideLoadingIndicator()
         
+        let alertAction: () -> Void = { [weak self] in
+            guard let self = self else { return }
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.questionFactory?.loadData()
+        }
+        
         let alertModel = AlertModel (
             title: "Что-то пошло не так(",
-            message: "Невозможно загрузить данные",
+            message: message,
             buttonText: "Попробовать ещё раз",
-            completion: {}
+            completion: alertAction
         )
-        
-        self.currentQuestionIndex = 0
-        self.correctAnswers = 0
-        
-        self.questionFactory?.loadData()
         
         self.alertPresenter?.presentAlert(model: alertModel)
     }
