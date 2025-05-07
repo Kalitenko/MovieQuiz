@@ -25,7 +25,6 @@ struct NetworkClient: NetworkRouting {
             guard let data else { return }
             handler(.success(data))
         }
-        
         task.resume()
     }
     

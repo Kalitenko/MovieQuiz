@@ -49,7 +49,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
     
     // MARK: - Private Methods
     private func makeQuizQuestion(from movie: MostPopularMovie) -> QuizQuestion? {
-        
         do {
             let imageData = try Data(contentsOf: movie.resizedImageURL)
             let rating = Float(movie.rating) ?? 0
@@ -61,7 +60,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
             didFailToLoadData(error: NetworkError.pictureLoadingError)
             return nil
         }
-        
     }
     
     private func didLoadDataFromServer() {

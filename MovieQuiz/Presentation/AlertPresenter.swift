@@ -29,7 +29,7 @@ final class AlertPresenter: AlertPresenterProtocol {
         DispatchQueue.main.async { [weak self] in
             self?.delegate?.presentAlert(viewControllerToPresent: alert)
         }
-        
     }
+    
 }
 

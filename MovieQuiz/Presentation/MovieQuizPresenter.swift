@@ -22,9 +22,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, StatisticServiceDelegat
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
         self.viewController?.hideLoadingIndicator()
-        guard let question = question else {
-            return
-        }
+        guard let question else { return }
         
         currentQuestion = question
         let viewModel = convert(model: question)
@@ -35,10 +33,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, StatisticServiceDelegat
     }
     
     func didFailToLoadData(with error: Error) {
-        var message = "Ошибка с загрузкой данных"
-        if let networkError = error as? NetworkError {
-            message = networkError.errorMessage()
-        }
+        let message = (error as? NetworkError)?.errorMessage() ?? "Не удалось загрузить данные. Попробуйте позже."
         viewController?.showNetworkError(message: message)
     }
     
@@ -53,9 +48,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, StatisticServiceDelegat
     
     // MARK: - StatisticServiceDelegate
     func didStoreData(bestGame: GameResult?) {
-        guard let bestGame = bestGame else {
-            return
-        }
+        guard let bestGame else { return }
         
         let accuracy = (String(format: "%.2f", statisticService?.totalAccuracy ?? Double.zero))
         let text = "Ваш результат: \(self.correctAnswers)/\(self.numberOfQuestions)\n" +
@@ -70,7 +63,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, StatisticServiceDelegat
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: result)
         }
-        
     }
     
     // MARK: - Public Methods
@@ -95,20 +87,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, StatisticServiceDelegat
             questionNumber: "\(currentQuestionIndex + 1)/\(numberOfQuestions)"
         )
     }
-    
-    // MARK: - Private Methods
+}
+
+// MARK: - Private Methods
+private extension MovieQuizPresenter {
     private func didAnswer(isCorrectAnswer: Bool) {
-        if isCorrectAnswer {
-            correctAnswers += 1
-        }
+        guard isCorrectAnswer else { return }
+        correctAnswers += 1
     }
     
-    private func didAnswer(isYes: Bool) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        
-        let givenAnswer = isYes
+    private func didAnswer(isYes givenAnswer: Bool) {
+        guard let currentQuestion else { return }
         
         self.proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
@@ -116,7 +105,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, StatisticServiceDelegat
     private func isLastQuestion() -> Bool {
         currentQuestionIndex == numberOfQuestions - 1
     }
-    
     
     private func switchToNextQuestion() {
         currentQuestionIndex += 1
@@ -139,9 +127,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, StatisticServiceDelegat
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.proceedToNextQuestionOrResults()
         }
     }
-    
 }

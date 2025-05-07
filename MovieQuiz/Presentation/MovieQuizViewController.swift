@@ -1,6 +1,8 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, AlertPresenterDelegate, MovieQuizViewControllerProtocol {
+final class MovieQuizViewController: UIViewController,
+                                     AlertPresenterDelegate,
+                                     MovieQuizViewControllerProtocol {
     
     // MARK: - IB Outlets
     @IBOutlet private weak var imageView: UIImageView!
@@ -15,7 +17,7 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate, M
     
     // MARK: - Private Properties
     private var alertPresenter: AlertPresenterProtocol?
-    private var presenter: MovieQuizPresenter!
+    private var presenter: MovieQuizPresenter?
     
     // MARK: - View Life Cycles
     override func viewDidLoad() {
@@ -33,12 +35,12 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate, M
     // MARK: - IB Actions
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         turnOffButtons()
-        presenter.yesButtonClicked()
+        presenter?.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         turnOffButtons()
-        presenter.noButtonClicked()
+        presenter?.noButtonClicked()
     }
     
     // MARK: - AlertPresenterDelegate
@@ -57,8 +59,8 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate, M
     
     func show(quiz result: QuizResultsViewModel) {
         let alertAction: () -> Void = { [weak self] in
-            guard let self = self else { return }
-            presenter.restartGame()
+            guard let self else { return }
+            presenter?.restartGame()
         }
         let alertModel = AlertModel (
             title: result.title,
@@ -88,10 +90,10 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate, M
         hideLoadingIndicator()
         
         let alertAction: () -> Void = { [weak self] in
-            guard let self = self else { return }
-            presenter.restartGame()
+            guard let self else { return }
+            presenter?.restartGame()
         }
-
+        
         let alertModel = AlertModel (
             title: "Что-то пошло не так(",
             message: message,
@@ -106,7 +108,7 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate, M
         self.alertPresenter = AlertPresenter(delegate: self)
         self.presenter = MovieQuizPresenter(viewController: self)
     }
-
+    
     private func changeButtonStatus(isEnabled: Bool) {
         yesButton.isEnabled = isEnabled
         noButton.isEnabled = isEnabled

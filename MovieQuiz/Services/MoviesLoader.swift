@@ -21,7 +21,6 @@ struct MoviesLoader: MoviesLoading {
     
     // MARK: - URL
     private var mostPopularMoviesUrl: URL {
-        
         guard let url = URL(string: Constants.mostPopularMoviesURLString) else {
             preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
