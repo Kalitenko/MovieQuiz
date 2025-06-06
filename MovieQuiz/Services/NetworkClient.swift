@@ -1,6 +1,10 @@
 import Foundation
 
-struct NetworkClient {
+protocol NetworkRouting {
+    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void)
+}
+
+struct NetworkClient: NetworkRouting {
     
     // MARK: - Public Methods
     func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
@@ -21,7 +25,6 @@ struct NetworkClient {
             guard let data else { return }
             handler(.success(data))
         }
-        
         task.resume()
     }
     
